@@ -160,15 +160,15 @@ const TimelineItem = ({ when, where, title, bullets }) => (
 function Navbar({ current, onNav }) {
   return (
     <header className={`sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/90 border-b border-slate-100`}>
-      <div className={`${theme.section} flex items-center justify-between py-3`}>
-        <a href="#home" onClick={(e)=>{e.preventDefault(); onNav("home");}} className="flex items-center gap-3">
+      <div className={`${theme.section} flex flex-col gap-2 md:flex-row items-center justify-between py-3 px-2`}>
+        <a href="#home" onClick={(e)=>{e.preventDefault(); onNav("home");}} className="flex items-center gap-3 w-full md:w-auto justify-center md:justify-start">
           <div className="h-9 w-9 rounded-xl bg-teal-600 grid place-content-center text-white font-bold">PT</div>
           <div>
-            <div className="font-semibold leading-tight">Taylor Phillips — DPT Candidate</div>
-            <div className="text-xs text-slate-500">Physiotherapy • Movement • Rehab</div>
+            <div className="font-semibold leading-tight text-center md:text-left">Taylor Phillips — DPT Candidate</div>
+            <div className="text-xs text-slate-500 text-center md:text-left">Physiotherapy • Movement • Rehab</div>
           </div>
         </a>
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="flex flex-wrap justify-center md:flex-nowrap md:flex items-center gap-1 w-full md:w-auto mt-2 md:mt-0">
           {PAGES.map(p => (
             <a
               key={p.id}
@@ -180,7 +180,7 @@ function Navbar({ current, onNav }) {
             </a>
           ))}
         </nav>
-        <a href="#contact" onClick={(e)=>{e.preventDefault(); onNav("contact");}} className="px-3 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-slate-800">Get in touch</a>
+        <a href="#contact" onClick={(e)=>{e.preventDefault(); onNav("contact");}} className="mt-2 md:mt-0 px-3 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 w-full md:w-auto text-center">Get in touch</a>
       </div>
     </header>
   );
@@ -188,17 +188,17 @@ function Navbar({ current, onNav }) {
 
 function Hero({ onPrimary }) {
   return (
-    <div className={`${theme.section} pt-14 md:pt-24 pb-12`}>
-      <div className="grid md:grid-cols-2 gap-10 items-center">
+    <div className={`${theme.section} pt-10 md:pt-24 pb-8 md:pb-12`}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-center">
         <div>
           <Badge>Doctor of Physical Therapy</Badge>
-          <h1 className="mt-4 text-3xl md:text-5xl font-semibold tracking-tight text-slate-900">Helping people move better, heal faster, and live fully.</h1>
-          <p className="mt-4 text-slate-600 max-w-xl">Hi! I’m <span className="font-semibold">Taylor Phillips</span> from Ponca City, Oklahoma a DPT candidate at Langston University focused on evidence‑based rehabilitation, human movement, and compassionate, patient‑centered care.</p>
-          <div className="mt-6 flex flex-wrap gap-3">
+          <h1 className="mt-4 text-2xl sm:text-3xl md:text-5xl font-semibold tracking-tight text-slate-900">Helping people move better, heal faster, and live fully.</h1>
+          <p className="mt-4 text-slate-600 max-w-xl text-base md:text-lg">Hi! I’m <span className="font-semibold">Taylor Phillips</span> from Ponca City, Oklahoma a DPT candidate at Langston University focused on evidence‑based rehabilitation, human movement, and compassionate, patient‑centered care.</p>
+          <div className="mt-6 flex flex-col sm:flex-row flex-wrap gap-3">
             <button onClick={onPrimary} className="px-5 py-2.5 rounded-xl bg-teal-600 text-white hover:bg-teal-700">Explore my work</button>
             <a href="#contact" className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50">Contact</a>
           </div>
-          <div className="mt-6 flex items-center gap-4 text-sm text-slate-500">
+          <div className="mt-6 flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm text-slate-500">
             <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500"/> Patient‑first</span>
             <span>Evidence‑based</span>
             <span>Interdisciplinary</span>
@@ -209,7 +209,7 @@ function Hero({ onPrimary }) {
             <img
               src={ptImg}
               alt="Physical therapy professional"
-              className="w-full h-[340px] md:h-[420px] object-cover"
+              className="w-full h-auto max-h-[340px] md:max-h-[420px] object-cover"
             />
           </div>
         </div>
@@ -226,16 +226,16 @@ function AboutPage({ onNext }) {
       subtitle="DPT candidate with a passion for restoring function and improving quality of life."
       onNext={onNext}
     >
-      <div className="grid md:grid-cols-3 gap-8 items-start">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-start">
         {/* Taylor's Photo - Larger and Centered */}
         <div className="flex flex-col items-center md:items-start">
           <img
             src={taylorImg}
             alt="Taylor Phillips portrait"
-            className="rounded-2xl shadow-xl w-64 h-80 object-cover mb-4 border-4 border-white"
+            className="rounded-2xl shadow-xl w-40 h-52 sm:w-56 sm:h-72 md:w-64 md:h-80 object-cover mb-4 border-4 border-white"
             style={{ background: '#e0f2fe' }}
           />
-          <span className="text-slate-700 text-center md:text-left text-lg font-semibold mt-2">Taylor Phillips</span>
+          <span className="text-slate-700 text-center md:text-left text-base sm:text-lg font-semibold mt-2">Taylor Phillips</span>
         </div>
         <div className="md:col-span-2 flex flex-col gap-6">
           <Card>
@@ -245,7 +245,7 @@ function AboutPage({ onNext }) {
               Taylor’s interests include orthopedics, sports rehab, and neuro-rehabilitation. She values collaboration with patients and providers to craft personalized, evidence-based plans that meet people where they are. Taylor is known for her positive attitude, strong work ethic, and commitment to lifelong learning in the field of physical therapy.
             </p>
           </Card>
-          <div className="grid sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
             <Card>
               <h4 className="font-medium">Education</h4>
               <ul className="mt-2 text-slate-700 text-sm space-y-1">
@@ -282,10 +282,10 @@ function AboutPage({ onNext }) {
               <img
                 src={tay4}
                 alt="Taylor with family"
-                className="rounded-xl shadow-md w-56 h-56 object-cover border-2 border-white"
+                className="rounded-xl shadow-md w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 object-cover border-2 border-white"
                 style={{ background: '#e0f2fe' }}
               />
-              <p className="mt-2 text-slate-700 leading-relaxed">
+              <p className="mt-2 text-slate-700 leading-relaxed text-center md:text-left">
                 Taylor comes from a supportive family that has always encouraged her academic and athletic pursuits. Their encouragement has played a key role in her journey to becoming a physical therapist.
               </p>
             </div>
@@ -294,23 +294,23 @@ function AboutPage({ onNext }) {
           <Card>
             <h3 className="text-lg font-semibold text-slate-900">Interests & Achievements</h3>
             <div className="flex flex-col gap-4">
-              <div className="flex flex-row gap-4 items-start">
+              <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
                 <img
                   src={tay3}
                   alt="Taylor playing football"
-                  className="rounded-xl shadow-md w-40 h-40 object-cover border-2 border-white"
+                  className="rounded-xl shadow-md w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 object-cover border-2 border-white"
                   style={{ background: '#e0f2fe' }}
                 />
                 <img
                   src={tay5}
                   alt="Taylor's soccer team"
-                  className="rounded-xl shadow-md w-40 h-40 object-cover border-2 border-white"
+                  className="rounded-xl shadow-md w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 object-cover border-2 border-white"
                   style={{ background: '#e0f2fe' }}
                 />
                 <img
                   src={tay6}
                   alt="Taylor's achievement"
-                  className="rounded-xl shadow-md w-40 h-40 object-cover border-2 border-white"
+                  className="rounded-xl shadow-md w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 object-cover border-2 border-white"
                   style={{ background: '#e0f2fe' }}
                 />
               </div>
@@ -352,7 +352,7 @@ function ExperiencePage({ onNext }) {
       subtitle="Internships, rotations, and hands‑on patient care."
       onNext={onNext}
     >
-      <div className="grid md:grid-cols-3 gap-6">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         {/* Timeline Infographic */}
         <Card className="md:col-span-2">
           <h3 className="text-lg font-semibold text-slate-900 mb-6">Rotations & Internships</h3>
@@ -414,7 +414,7 @@ function ResearchPage({ onNext }) {
       subtitle="Evidence‑based practice, case studies, and academic work."
       onNext={onNext}
     >
-      <div className="grid md:grid-cols-2 gap-6">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <Card>
             <h3 className="text-lg font-semibold text-slate-900 mb-2">Recent Publications</h3>
             <ul className="divide-y divide-slate-200">
@@ -466,7 +466,7 @@ function SkillBar({ label, percent, color }) {
 function AchievementsPage({ onNext }) {
   return (
     <Section id="achievements" title="Achievements" subtitle="Milestones, honors, leadership, and community impact." onNext={onNext}>
-      <div className="grid md:grid-cols-3 gap-6">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         {/* Infographic Card: Bar Chart for Achievements */}
         <Card className="md:col-span-2">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Key Achievements</h3>
@@ -541,7 +541,7 @@ function ContactPage() {
       title="Get in Touch"
       subtitle="Have a question, collaboration, or placement opportunity? Let’s talk."
     >
-      <div className="grid md:grid-cols-3 gap-6">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         <Card className="md:col-span-2">
           {/* Contact form with mailto handler */}
           <ContactForm />
@@ -617,9 +617,9 @@ function Footer() {
     setTimeout(() => setShowEgg(false), 5000);
   }
   return (
-    <footer className="mt-16 border-t border-slate-100 relative">
+  <footer className="mt-10 md:mt-16 border-t border-slate-100 relative">
       <EasterEggPopup show={showEgg} />
-      <div className={`${theme.section} py-10 flex flex-col md:flex-row items-center justify-between gap-4`}>
+  <div className={`${theme.section} py-6 md:py-10 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4 px-2`}>
         <div className="text-slate-500 text-sm">© {new Date().getFullYear()} Taylor Phillips • DPT Candidate</div>
         <div className="text-slate-500 text-sm flex items-center gap-2">
           Built with ❤️ by Baba
