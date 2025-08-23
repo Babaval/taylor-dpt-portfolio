@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Body baseline for better typography */
+html, body, #root {
+  height: 100%;
+}
+
+/* Optional smoother rendering for the subtle SVG grid */
+svg {
+  shape-rendering: crispEdges;
+}
