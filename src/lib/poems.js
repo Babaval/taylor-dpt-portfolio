@@ -1,5 +1,3 @@
-// src/lib/poems.js
-
 const POEMS = {
   default: [
     "Your strength turns small storms into gentle breeze; you move with purpose, you make hearts at ease.",
@@ -28,10 +26,10 @@ const POEMS = {
   ],
   mermaid: [
     "Like ocean songs you call me near; a magic tide when you are here.",
-    "You move like water, graceful, free; you are the sea’s bright mystery to me.",
+    "You move like water, graceful, free; you are the seas bright mystery to me.",
   ],
   sun: [
-    "You are the morning’s gentle flame; the world wakes sweeter with your name.",
+    "You are the mornings gentle flame; the world wakes sweeter with your name.",
     "Bright as sunrise, warm and true; the day begins and blooms with you.",
   ],
   moon: [
@@ -40,7 +38,7 @@ const POEMS = {
   ],
   angel: [
     "A halo in a crowded room; you lift my heart and chase the gloom.",
-    "Gentle guardian, brave and kind; you are the grace I’d like to find.",
+    "Gentle guardian, brave and kind; you are the grace Id like to find.",
   ],
   love: [
     "Your smile begins the sweetest day; in every little way you stay.",
@@ -65,7 +63,7 @@ export function choosePoem(tag) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
-// Direct mapping for specific emojis to poems
+// Direct mapping for specific emojis to poems (user-provided list)
 export const EMOJI_POEMS = {
   // Romance & Beauty
   '🌹': 'Like a rose, your presence blooms in every corner of my heart.',
@@ -103,7 +101,6 @@ export const EMOJI_POEMS = {
   '📖': 'You’re the story I’ll keep rereading forever.',
   '🕰️': 'Time bends when I’m with you—minutes feel like eternity.',
   '🌍': 'Out of the whole world, it’s you who feels like home.',
-  // Fresh set
   '🪐': 'You orbit my thoughts like Saturn’s eternal rings.',
   '🧚': 'You carry the magic of a fairy, unseen but felt.',
   '🪞': 'Every mirror would envy the truth it reflects in you.',
@@ -118,7 +115,7 @@ export const EMOJI_POEMS = {
   '🪶': 'Your words are as soft as a feather on my skin.',
   '🦢': 'Graceful as a swan, you glide through my thoughts.',
   '🐚': 'Like a seashell, you carry an ocean’s secret song.',
-  '🪽': 'With wings or not, you lift me higher than skies.',
+  '🪽✨': 'Your spirit carries wings of light no storm can break.',
   '🕊️🌿': 'You are the peace after every war inside me.',
   '🪷': 'You are a lotus, rising pure from the waters of chaos.',
   '🌒': 'Even in half-light, you’re more whole than my world.',
