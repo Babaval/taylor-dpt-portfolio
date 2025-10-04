@@ -1,11 +1,22 @@
-import React, { useEffect, useMemo, useState } from "react";
+// src/App.jsx
+import React, { useEffect, useMemo, useState, useCallback } from "react";
+import SeaAnimals from "./components/SeaAnimals";
+import { choosePoem, EMOJI_POEMS } from "./lib/poems";
+
 import taylorImg from "./asserts/taylor.jpg";
 import ContactForm from "./ContactForm";
-import ptImg from "./asserts/PT.jpg";
+import ptImg from "./asserts/PT.jpg"; // kept (unused in hero now; safe to remove if you want)
 import tay3 from "./asserts/tay3.jpg";
 import tay4 from "./asserts/tay4.jpg";
 import tay5 from "./asserts/tay5.jpg";
 import tay6 from "./asserts/tay6.jpg";
+
+// ✅ New hero images
+import top5physi from "./asserts/Top5.jpg";
+import PT6 from "./asserts/PT66.jpg";
+import PT7 from "./asserts/PT77.jpeg";
+import PT8 from "./asserts/PT88.webp";
+import PT9 from "./asserts/PT99.webp";
 
 // ---- Simple in-file router using URL hash ---------------------------------
 const PAGES = [
@@ -27,7 +38,7 @@ function useHashRoute(defaultPage = "home") {
   }, [defaultPage]);
 
   const navigate = (to) => {
-    if (to.startsWith("#")) window.location.hash = to;
+    if (to?.startsWith("#")) window.location.hash = to;
     else window.location.hash = `#${to}`;
   };
 
@@ -37,7 +48,6 @@ function useHashRoute(defaultPage = "home") {
 // ---- Design tokens ---------------------------------------------------------
 const theme = {
   brand: {
-    // Brighter, more vibrant background
     bg: "bg-gradient-to-br from-teal-200 via-emerald-100 to-cyan-100",
     primary: "text-teal-700",
     accent: "text-emerald-600",
@@ -48,67 +58,20 @@ const theme = {
 };
 
 // ---- Background layer ------------------------------------------------------
-
-// Animated blobs background for the site
 function SiteBackground() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-      {/* Animated blobs background */}
       <div className="absolute inset-0 w-full h-full">
         <div className="blob blob1" />
         <div className="blob blob2" />
         <div className="blob blob3" />
       </div>
       <style>{`
-        .blob {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(60px);
-          opacity: 0.5;
-          mix-blend-mode: multiply;
-          animation: blobMove 18s ease-in-out infinite;
-        }
-        .blob1 {
-          width: 38vw;
-          height: 38vw;
-          min-width: 320px;
-          min-height: 320px;
-          background: linear-gradient(135deg, #5eead4 0%, #2dd4bf 100%);
-          top: -10%;
-          left: -10%;
-          animation-delay: 0s;
-        }
-        .blob2 {
-          width: 32vw;
-          height: 32vw;
-          min-width: 260px;
-          min-height: 260px;
-          background: linear-gradient(135deg, #a7f3d0 0%, #34d399 100%);
-          top: 40%;
-          left: 60%;
-          animation-delay: 6s;
-        }
-        .blob3 {
-          width: 28vw;
-          height: 28vw;
-          min-width: 200px;
-          min-height: 200px;
-          background: linear-gradient(135deg, #f0fded 0%, #99f6e4 100%);
-          top: 60%;
-          left: 10%;
-          animation-delay: 12s;
-        }
-        @keyframes blobMove {
-          0%, 100% {
-            transform: scale(1) translate(0px, 0px);
-          }
-          33% {
-            transform: scale(1.1) translate(30px, -20px);
-          }
-          66% {
-            transform: scale(0.95) translate(-20px, 30px);
-          }
-        }
+        .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.5; mix-blend-mode: multiply; animation: blobMove 18s ease-in-out infinite; }
+        .blob1 { width: 38vw; height: 38vw; min-width: 320px; min-height: 320px; background: linear-gradient(135deg, #5eead4 0%, #2dd4bf 100%); top: -10%; left: -10%; animation-delay: 0s; }
+        .blob2 { width: 32vw; height: 32vw; min-width: 260px; min-height: 260px; background: linear-gradient(135deg, #a7f3d0 0%, #34d399 100%); top: 40%; left: 60%; animation-delay: 6s; }
+        .blob3 { width: 28vw; height: 28vw; min-width: 200px; min-height: 200px; background: linear-gradient(135deg, #f0fded 0%, #99f6e4 100%); top: 60%; left: 10%; animation-delay: 12s; }
+        @keyframes blobMove { 0%, 100% { transform: scale(1) translate(0px, 0px) } 33% { transform: scale(1.1) translate(30px, -20px) } 66% { transform: scale(0.95) translate(-20px, 30px) } }
       `}</style>
     </div>
   );
@@ -143,11 +106,11 @@ const Card = ({ children, className = "" }) => (
   <div className={`${theme.card} p-5 md:p-6 ${className}`}>{children}</div>
 );
 
-const Divider = () => <div className="h-px w-full bg-slate-100"/>;
+const Divider = () => <div className="h-px w-full bg-slate-100" />;
 
 const TimelineItem = ({ when, where, title, bullets }) => (
   <li className="relative pl-8">
-    <span className="absolute left-0 top-2 h-3 w-3 rounded-full bg-teal-600"/>
+    <span className="absolute left-0 top-2 h-3 w-3 rounded-full bg-teal-600" />
     <div className="text-sm text-slate-500">{when} • {where}</div>
     <div className="font-semibold text-slate-900 mt-0.5">{title}</div>
     <ul className="list-disc ml-5 mt-2 text-slate-700 space-y-1">
@@ -155,6 +118,132 @@ const TimelineItem = ({ when, where, title, bullets }) => (
     </ul>
   </li>
 );
+
+// ---- Curated emojis (kept for footer Easter Egg) ---------------------------
+const CURATED_EMOJIS = [
+  '🌹','🌸','🌼','🌻','💐',
+  '🌙','✨','🌟','💫','🌌',
+  '☀️','🌈','🔥','🌞','🕊️',
+  '🦋','🌊','🍃','🌲','🌺',
+  '❤️','🩷','💜','💕','💖',
+  '🎶','🎨','📖','🕰️','🌍',
+  '🪐','🧚','🪞','🕯️','🧿',
+  '🏹','🪄','🗝️','🎇','🌋',
+  '🪻','🪶','🦢','🐚','🪽',
+  '🕊️🌿','🪷','🌒','🎐','🪁',
+  '🪙','🧭','🧊','🪨','🧵',
+  '🐉','🦄','🧜‍♀️','🎭','🛡️'
+];
+
+// ---- Accessibility: reduced motion ----------------------------------------
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = () => setReduced(!!mq.matches);
+    onChange();
+    mq.addEventListener ? mq.addEventListener("change", onChange) : mq.addListener(onChange);
+    return () => (mq.removeEventListener ? mq.removeEventListener("change", onChange) : mq.removeListener(onChange));
+  }, []);
+  return reduced;
+}
+
+// ---- Image Showcase (replaces static hero image) ---------------------------
+function HeroImageShowcase() {
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  const SLIDES = useMemo(() => [
+    { src: top5physi, caption: "Evidence-based rehabilitation for every body." },
+    { src: PT6,       caption: "Teamwork, movement, and measurable progress." },
+    { src: PT7,       caption: "Strength returns one stable step at a time." },
+    { src: PT8,       caption: "Athletics to everyday life—programs tailored to goals." },
+    { src: PT9,       caption: "Guided healing with compassion and science." },
+  ], []);
+
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (paused || prefersReducedMotion) return;
+    const id = setInterval(() => setIndex((i) => (i + 1) % SLIDES.length), 4200);
+    return () => clearInterval(id);
+  }, [paused, prefersReducedMotion, SLIDES.length]);
+
+  const go = useCallback((n) => {
+    setIndex((i) => (i + n + SLIDES.length) % SLIDES.length);
+  }, [SLIDES.length]);
+
+  const active = SLIDES[index];
+
+  return (
+    <div
+      className={`${theme.card} overflow-hidden relative`}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onTouchStart={() => setPaused(true)}
+      onTouchEnd={() => setPaused(false)}
+    >
+      <div className="relative w-full h-[340px] md:h-[420px]">
+        <img
+          key={active.src}
+          src={active.src}
+          alt={active.caption}
+          className={`absolute inset-0 w-full h-full object-cover ${prefersReducedMotion ? "" : "animate-slide-fade"}`}
+        />
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/50 to-transparent" />
+        <div className="absolute bottom-3 left-3 right-3">
+          <div className="inline-block bg-white/85 backdrop-blur px-3 py-1.5 rounded-lg text-sm md:text-base font-medium text-slate-800 border border-white/60 shadow">
+            {active.caption}
+          </div>
+        </div>
+
+        <button
+          aria-label="Previous slide"
+          onClick={() => go(-1)}
+          className="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 grid place-items-center rounded-full bg-white/80 hover:bg-white shadow border border-white/70"
+        >
+          ‹
+        </button>
+        <button
+          aria-label="Next slide"
+          onClick={() => go(1)}
+          className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 grid place-items-center rounded-full bg-white/80 hover:bg-white shadow border border-white/70"
+        >
+          ›
+        </button>
+
+        <div className="absolute bottom-3 w-full flex justify-center gap-2">
+          {SLIDES.map((_, i) => (
+            <button
+              key={i}
+              aria-label={`Go to slide ${i+1}`}
+              onClick={() => setIndex(i)}
+              className={`h-2.5 w-2.5 rounded-full border border-white/70 ${i===index ? "bg-white" : "bg-white/40"}`}
+            />
+          ))}
+        </div>
+
+        <div className="absolute top-2 right-2 text-[10px] md:text-xs text-slate-600 bg-white/80 rounded-md px-2 py-0.5 border border-white/70">
+          {paused ? "paused" : "hover/tap to pause"}
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes slideFade {
+          0% { opacity: 0; transform: scale(1.02) }
+          15% { opacity: 1; transform: scale(1.0) }
+          85% { opacity: 1; transform: scale(1.0) }
+          100% { opacity: 0; transform: scale(0.995) }
+        }
+        .animate-slide-fade { animation: slideFade 4s ease-in-out; }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-slide-fade { animation: none !important; }
+        }
+      `}</style>
+    </div>
+  );
+}
 
 // ---- Page components -------------------------------------------------------
 function Navbar({ current, onNav }) {
@@ -193,26 +282,20 @@ function Hero({ onPrimary }) {
         <div>
           <Badge>Doctor of Physical Therapy</Badge>
           <h1 className="mt-4 text-2xl sm:text-3xl md:text-5xl font-semibold tracking-tight text-slate-900">Helping people move better, heal faster, and live fully.</h1>
-          <p className="mt-4 text-slate-600 max-w-xl text-base md:text-lg">Hi! I’m <span className="font-semibold">Taylor Phillips</span> from Ponca City, Oklahoma a DPT candidate at Langston University focused on evidence‑based rehabilitation, human movement, and compassionate, patient‑centered care.</p>
+          <p className="mt-4 text-slate-600 max-w-xl text-base md:text-lg">Hi! I’m <span className="font-semibold">Taylor Phillips</span> from Ponca City, Oklahoma a DPT candidate at Langston University focused on evidence-based rehabilitation, human movement, and compassionate, patient-centered care.</p>
           <div className="mt-6 flex flex-col sm:flex-row flex-wrap gap-3">
             <button onClick={onPrimary} className="px-5 py-2.5 rounded-xl bg-teal-600 text-white hover:bg-teal-700">Explore my work</button>
             <a href="#contact" className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50">Contact</a>
           </div>
           <div className="mt-6 flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm text-slate-500">
-            <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500"/> Patient‑first</span>
-            <span>Evidence‑based</span>
+            <span className="inline-flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500"/> Patient-first</span>
+            <span>Evidence-based</span>
             <span>Interdisciplinary</span>
           </div>
         </div>
-        <div>
-          <div className={`${theme.card} overflow-hidden`}>
-            <img
-              src={ptImg}
-              alt="Physical therapy professional"
-              className="w-full h-auto max-h-[340px] md:max-h-[420px] object-cover"
-            />
-          </div>
-        </div>
+
+        {/* NEW: rotating image showcase */}
+        <HeroImageShowcase />
       </div>
     </div>
   );
@@ -226,8 +309,7 @@ function AboutPage({ onNext }) {
       subtitle="DPT candidate with a passion for restoring function and improving quality of life."
       onNext={onNext}
     >
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-start">
-        {/* Taylor's Photo - Larger and Centered */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-start">
         <div className="flex flex-col items-center md:items-start">
           <img
             src={taylorImg}
@@ -269,13 +351,12 @@ function AboutPage({ onNext }) {
               <li>Birthday: March 17</li>
               <li>Hometown: Ponca City, Oklahoma</li>
               <li>CPR/AED Certified</li>
-              <li>HIPAA‑aware documentation</li>
+              <li>HIPAA-aware documentation</li>
               <li>EMR familiar: Epic, WebPT</li>
               <li>Volunteer: Community mobility workshops</li>
               <li>Started as Physical Therapy Tech at Northern Therapy and Rehabilitation</li>
             </ul>
           </Card>
-          {/* Family Section */}
           <Card>
             <h3 className="text-lg font-semibold text-slate-900">Family</h3>
             <div className="flex flex-col md:flex-row gap-4 items-center md:items-start">
@@ -290,7 +371,6 @@ function AboutPage({ onNext }) {
               </p>
             </div>
           </Card>
-          {/* Interests Section */}
           <Card>
             <h3 className="text-lg font-semibold text-slate-900">Interests & Achievements</h3>
             <div className="flex flex-col gap-4">
@@ -349,15 +429,13 @@ function ExperiencePage({ onNext }) {
           </a>
         </span>
       }
-      subtitle="Internships, rotations, and hands‑on patient care."
+      subtitle="Internships, rotations, and hands-on patient care."
       onNext={onNext}
     >
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-        {/* Timeline Infographic */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         <Card className="md:col-span-2">
           <h3 className="text-lg font-semibold text-slate-900 mb-6">Rotations & Internships</h3>
           <div className="relative pl-8 before:content-[''] before:absolute before:top-0 before:left-4 before:w-1 before:h-full before:bg-gradient-to-b before:from-teal-300 before:to-emerald-200 before:rounded-full">
-            {/* Timeline Item 1 */}
             <div className="relative mb-12">
               <div className="absolute -left-2 top-0 w-8 h-8 flex items-center justify-center bg-white border-4 border-emerald-200 rounded-full shadow-lg">
                 <svg className="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-2a4 4 0 014-4h2a4 4 0 014 4v2" /><circle cx="12" cy="7" r="4" /></svg>
@@ -368,12 +446,11 @@ function ExperiencePage({ onNext }) {
                 <div className="text-sm text-slate-600 mb-2">Clinical Intern — Orthopedics & Sports</div>
                 <ul className="list-disc ml-5 text-slate-700 text-sm space-y-1">
                   <li>Performed initial assessments under supervision and contributed to individualized treatment plans.</li>
-                  <li>Led therapeutic exercise sessions emphasizing return‑to‑sport milestones.</li>
+                  <li>Led therapeutic exercise sessions emphasizing return-to-sport milestones.</li>
                   <li>Tracked outcomes: ROM, strength, and functional movement screens.</li>
                 </ul>
               </div>
             </div>
-            {/* Timeline Item 2 */}
             <div className="relative mb-12">
               <div className="absolute -left-2 top-0 w-8 h-8 flex items-center justify-center bg-white border-4 border-teal-200 rounded-full shadow-lg">
                 <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 21H5a2 2 0 01-2-2V7a2 2 0 012-2h5l2-2h5a2 2 0 012 2v12a2 2 0 01-2 2z" /></svg>
@@ -384,14 +461,13 @@ function ExperiencePage({ onNext }) {
                 <div className="text-sm text-slate-600 mb-2">Student Therapist — Neuro Rehab</div>
                 <ul className="list-disc ml-5 text-slate-700 text-sm space-y-1">
                   <li>Supported gait training and balance interventions for stroke recovery.</li>
-                  <li>Applied task‑oriented strategies and cueing to improve ADLs.</li>
+                  <li>Applied task-oriented strategies and cueing to improve ADLs.</li>
                   <li>Collaborated with OTs and SLPs in an interdisciplinary team.</li>
                 </ul>
               </div>
             </div>
           </div>
         </Card>
-        {/* Animated Skills Chart */}
         <Card>
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Skills in Practice</h3>
           <div className="space-y-4">
@@ -411,41 +487,40 @@ function ResearchPage({ onNext }) {
     <Section
       id="research"
       title="Research & Projects"
-      subtitle="Evidence‑based practice, case studies, and academic work."
+      subtitle="Evidence-based practice, case studies, and academic work."
       onNext={onNext}
     >
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          <Card>
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">Recent Publications</h3>
-            <ul className="divide-y divide-slate-200">
-              <li className="py-2">
-                <div className="font-medium text-slate-800">"The Impact of Early Mobilization on Post-Operative Recovery in Orthopedic Patients"</div>
-                <div className="text-xs text-slate-500">Taylor Smith, J. Doe, A. Lee — <span className="italic">Journal of Physical Therapy Science</span>, 2025</div>
-              </li>
-              <li className="py-2">
-                <div className="font-medium text-slate-800">"Aquatic Therapy for Stroke Rehabilitation: A Systematic Review"</div>
-                <div className="text-xs text-slate-500">Taylor Smith, M. Patel — <span className="italic">Rehabilitation Research & Practice</span>, 2024</div>
-              </li>
-              <li className="py-2">
-                <div className="font-medium text-slate-800">"Balance Training Protocols for Older Adults: A Randomized Controlled Trial"</div>
-                <div className="text-xs text-slate-500">Taylor Smith, S. Kim — <span className="italic">Geriatric PT Journal</span>, 2023</div>
-              </li>
-            </ul>
-          </Card>
-          <Card>
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">Projects & Posters</h3>
-            <ul className="list-disc ml-5 text-slate-700 text-sm space-y-2">
-              <li>Capstone: "Optimizing Gait Retraining in Post-ACL Reconstruction Patients"</li>
-              <li>Poster: "The Role of Aquatic Therapy in Early Stroke Rehab"</li>
-              <li>Community Project: "Move Better" Workshops for Local Schools</li>
-            </ul>
-          </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <Card>
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">Recent Publications</h3>
+          <ul className="divide-y divide-slate-200">
+            <li className="py-2">
+              <div className="font-medium text-slate-800">The Impact of Early Mobilization on Post-Operative Recovery in Orthopedic Patients</div>
+              <div className="text-xs text-slate-500">Taylor Smith, J. Doe, A. Lee — <span className="italic">Journal of Physical Therapy Science</span>, 2025</div>
+            </li>
+            <li className="py-2">
+              <div className="font-medium text-slate-800">Aquatic Therapy for Stroke Rehabilitation: A Systematic Review</div>
+              <div className="text-xs text-slate-500">Taylor Smith, M. Patel — <span className="italic">Rehabilitation Research & Practice</span>, 2024</div>
+            </li>
+            <li className="py-2">
+              <div className="font-medium text-slate-800">Balance Training Protocols for Older Adults: A Randomized Controlled Trial</div>
+              <div className="text-xs text-slate-500">Taylor Smith, S. Kim — <span className="italic">Geriatric PT Journal</span>, 2023</div>
+            </li>
+          </ul>
+        </Card>
+        <Card>
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">Projects & Posters</h3>
+          <ul className="list-disc ml-5 text-slate-700 text-sm space-y-2">
+            <li>Capstone: Optimizing Gait Retraining in Post-ACL Reconstruction Patients</li>
+            <li>Poster: The Role of Aquatic Therapy in Early Stroke Rehab</li>
+            <li>Community Project: “Move Better” Workshops for Local Schools</li>
+          </ul>
+        </Card>
       </div>
     </Section>
   );
 }
 
-// Animated SkillBar component
 function SkillBar({ label, percent, color }) {
   return (
     <div>
@@ -466,21 +541,17 @@ function SkillBar({ label, percent, color }) {
 function AchievementsPage({ onNext }) {
   return (
     <Section id="achievements" title="Achievements" subtitle="Milestones, honors, leadership, and community impact." onNext={onNext}>
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-        {/* Infographic Card: Bar Chart for Achievements */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         <Card className="md:col-span-2">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Key Achievements</h3>
           <div className="w-full flex flex-col md:flex-row gap-8 items-center">
             <div className="flex-1">
               <svg viewBox="0 0 320 160" width="100%" height="120" className="mb-2">
-                {/* Bar chart background */}
                 <rect x="0" y="0" width="320" height="160" fill="#f0fdfa" rx="16" />
-                {/* Bars */}
                 <rect x="30" y="60" width="32" height="80" fill="#2dd4bf" rx="6" />
                 <rect x="90" y="30" width="32" height="110" fill="#34d399" rx="6" />
                 <rect x="150" y="90" width="32" height="50" fill="#5eead4" rx="6" />
                 <rect x="210" y="40" width="32" height="100" fill="#99f6e4" rx="6" />
-                {/* Labels */}
                 <text x="46" y="155" fontSize="13" fill="#0f172a" textAnchor="middle">DPT</text>
                 <text x="106" y="155" fontSize="13" fill="#0f172a" textAnchor="middle">NOC</text>
                 <text x="166" y="155" fontSize="13" fill="#0f172a" textAnchor="middle">OSU</text>
@@ -501,7 +572,6 @@ function AchievementsPage({ onNext }) {
             </ul>
           </div>
         </Card>
-        {/* Infographic Card: Pie Chart for Interests */}
         <Card>
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Interests Breakdown</h3>
           <div className="flex flex-col items-center">
@@ -520,13 +590,12 @@ function AchievementsPage({ onNext }) {
             </div>
           </div>
         </Card>
-        {/* Leadership & Service Card */}
         <Card>
           <h3 className="text-lg font-semibold text-slate-900">Leadership & Service</h3>
           <ul className="mt-3 list-disc ml-5 text-slate-700 text-sm space-y-2">
             <li>Student Member — APTA (American Physical Therapy Association)</li>
-            <li>Volunteer — Local 5K events: warm‑up stations & injury prevention booths</li>
-            <li>Clinic Hours — Assisted therapists with patient intake and home‑exercise education</li>
+            <li>Volunteer — Local 5K events: warm-up stations & injury prevention booths</li>
+            <li>Clinic Hours — Assisted therapists with patient intake and home-exercise education</li>
           </ul>
         </Card>
       </div>
@@ -541,31 +610,26 @@ function ContactPage() {
       title="Get in Touch"
       subtitle="Have a question, collaboration, or placement opportunity? Let’s talk."
     >
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         <Card className="md:col-span-2">
-          {/* Contact form with mailto handler */}
           <ContactForm />
         </Card>
         <Card>
           <h3 className="text-lg font-semibold text-slate-900">Connect</h3>
           <ul className="mt-3 text-slate-700 text-sm space-y-2">
             <li className="flex items-center gap-2">
-              {/* LinkedIn: Crisp SVG */}
               <svg width="20" height="20" viewBox="0 0 32 32" fill="none" className="inline-block"><rect width="32" height="32" rx="6" fill="#2563eb"/><path d="M10.5 13.5V22.5" stroke="#fff" strokeWidth="2" strokeLinecap="round"/><circle cx="10.5" cy="10.5" r="1.5" fill="#fff"/><path d="M15.5 16.5V22.5M15.5 18.5C15.5 17.1193 16.6193 16 18 16C19.3807 16 20.5 17.1193 20.5 18.5V22.5" stroke="#fff" strokeWidth="2" strokeLinecap="round"/></svg>
               <span>LinkedIn:</span> <a className="underline" href="https://linkedin.com/in/taylor-phillips" target="_blank" rel="noopener noreferrer">linkedin.com/in/taylor-phillips <span className="text-xs">(sample)</span></a>
             </li>
             <li className="flex items-center gap-2">
-              {/* Instagram: Modern SVG */}
               <svg width="20" height="20" viewBox="0 0 32 32" fill="none" className="inline-block"><rect width="32" height="32" rx="8" fill="#e1306c"/><circle cx="16" cy="16" r="7" stroke="#fff" strokeWidth="2"/><circle cx="23" cy="9" r="1.5" fill="#fff"/></svg>
-                <span>Instagram:</span> <a className="underline" href="https://www.instagram.com/tailer_flips/" target="_blank" rel="noopener noreferrer">@tailer_flips</a>
+              <span>Instagram:</span> <a className="underline" href="https://www.instagram.com/tailer_flips/" target="_blank" rel="noopener noreferrer">@tailer_flips</a>
             </li>
             <li className="flex items-center gap-2">
-              {/* Resume: Download SVG */}
               <svg width="20" height="20" viewBox="0 0 32 32" fill="none" className="inline-block"><rect width="32" height="32" rx="8" fill="#0ea5e9"/><path d="M16 10V22M16 22L11 17M16 22L21 17" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
               <span>Resume:</span> <a className="underline" href="/resume/taylorResume.pdf" target="_blank" rel="noopener noreferrer">Download PDF</a>
             </li>
             <li className="flex items-center gap-2">
-              {/* Location: Pin SVG */}
               <svg width="20" height="20" viewBox="0 0 32 32" fill="none" className="inline-block"><rect width="32" height="32" rx="8" fill="#22c55e"/><path d="M16 25C20 19 24 15.4183 24 12C24 8.68629 21.3137 6 18 6C14.6863 6 12 8.68629 12 12C12 15.4183 16 19 16 25Z" stroke="#fff" strokeWidth="2"/><circle cx="18" cy="12" r="2" fill="#fff"/></svg>
               <span>Location:</span> Ponca City, OK
             </li>
@@ -576,57 +640,94 @@ function ContactPage() {
   );
 }
 
-
-function EasterEggPopup({ show }) {
-  if (!show) return null;
+// ---- Emoji/Poem popup (kept for footer Easter Egg) ------------------------
+function EmojiPoemPopup({ visible, emojiChar, poem }) {
+  if (!visible) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-      <div
-        className="flex items-center justify-center animate-pop"
-        style={{
-          background: '#fff',
-          borderRadius: '9999px',
-          boxShadow: '0 8px 40px 0 rgba(0,0,0,0.18)',
-          width: 180,
-          height: 180,
-          minWidth: 120,
-          minHeight: 120,
-          pointerEvents: 'auto',
-        }}
-      >
-        <span style={{ fontSize: 96, display: 'block' }} role="img" aria-label="Smile">😊</span>
+      <div className="text-center pointer-events-none select-none">
+        {emojiChar && (
+          <div className="mb-4 animate-pop" style={{ fontSize: 96, lineHeight: 1 }} aria-hidden>
+            {Array.isArray(emojiChar) ? emojiChar[0] : emojiChar}
+          </div>
+        )}
+        {poem && (
+          <div className="animate-fade-in text-slate-900 text-lg md:text-2xl font-semibold px-6 py-4 rounded-2xl shadow-2xl relative bg-white/90">
+            <div className="twinkle absolute -inset-1 rounded-2xl pointer-events-none" aria-hidden />
+            <div className="relative z-10">{poem}</div>
+          </div>
+        )}
       </div>
       <style>{`
-        .animate-pop {
-          animation: popIn 0.5s cubic-bezier(.68,-0.55,.27,1.55);
+        .animate-pop { animation: popIn 0.45s cubic-bezier(.22,.9,.36,1) both; }
+        .animate-fade-in { animation: fadeIn 0.4s ease both; }
+        @keyframes popIn { 0% { transform: scale(0.2); opacity: 0 } 100% { transform: scale(1); opacity: 1 } }
+        @keyframes fadeIn { 0% { opacity: 0; transform: translateY(6px) } 100% { opacity: 1; transform: translateY(0) } }
+        .twinkle {
+          background: radial-gradient(circle at 10% 20%, rgba(255,232,150,0.9) 0%, rgba(255,232,150,0.0) 6%),
+                      radial-gradient(circle at 80% 80%, rgba(255,200,200,0.85) 0%, rgba(255,200,200,0.0) 6%),
+                      linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+          box-shadow: 0 6px 30px rgba(0,0,0,0.12) inset;
+          animation: twinkle 1.2s linear infinite;
+          mix-blend-mode: screen;
         }
-        @keyframes popIn {
-          0% { transform: scale(0.2); opacity: 0; }
-          80% { transform: scale(1.1); opacity: 1; }
-          100% { transform: scale(1); opacity: 1; }
-        }
+        @keyframes twinkle {
+          0% { opacity: 0.85; filter: blur(0px) }
+          50% { opacity: 1; filter: blur(1px) }
+          100% { opacity: 0.85; filter: blur(0px) }
       `}</style>
     </div>
   );
 }
 
 function Footer() {
-  const [showEgg, setShowEgg] = useState(false);
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [showPoem, setShowPoem] = useState(false);
+  const [currentEmojiSeq, setCurrentEmojiSeq] = useState(['😊']);
+  const [currentPoem, setCurrentPoem] = useState('');
+  const timersRef = React.useRef([]);
+
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach(t => clearTimeout(t));
+      timersRef.current = [];
+    };
+  }, []);
+
   function handleEggClick() {
-    setShowEgg(true);
-    setTimeout(() => setShowEgg(false), 5000);
+    timersRef.current.forEach((t) => clearTimeout(t));
+    timersRef.current = [];
+    setShowPoem(false);
+
+    const chosen = CURATED_EMOJIS[Math.floor(Math.random() * CURATED_EMOJIS.length)];
+    setCurrentEmojiSeq([chosen]);
+    setShowEmoji(true);
+
+    const tShowPoem = setTimeout(() => {
+      setShowEmoji(false);
+      const poem =
+        EMOJI_POEMS[chosen] ||
+        (typeof choosePoem === 'function' ? choosePoem('default') : 'You are the line my soul keeps reading.');
+      setCurrentPoem(poem);
+      setShowPoem(true);
+      const tHide = setTimeout(() => setShowPoem(false), 5000);
+      timersRef.current.push(tHide);
+    }, 5000);
+
+    timersRef.current.push(tShowPoem);
   }
+
   return (
-  <footer className="mt-10 md:mt-16 border-t border-slate-100 relative">
-      <EasterEggPopup show={showEgg} />
-  <div className={`${theme.section} py-6 md:py-10 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4 px-2`}>
+    <footer className="mt-10 md:mt-16 border-t border-slate-100 relative">
+      <EmojiPoemPopup visible={showEmoji || showPoem} emojiChar={showEmoji ? currentEmojiSeq : null} poem={showPoem ? currentPoem : null} />
+      <div className={`${theme.section} py-6 md:py-10 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4 px-2`}>
         <div className="text-slate-500 text-sm">© {new Date().getFullYear()} Taylor Phillips • DPT Candidate</div>
         <div className="text-slate-500 text-sm flex items-center gap-2">
           Built with ❤️ by Baba
-          {/* Easter Egg: colored egg icon with background, cursor-pointer */}
           <button
+            type="button"
             aria-label="Easter Egg"
-            onClick={handleEggClick}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEggClick(); }}
             style={{ opacity: 0.6, marginLeft: 8, background: 'none', border: 'none', cursor: 'pointer', transition: 'opacity 0.2s', padding: 0 }}
             onMouseOver={e => (e.currentTarget.style.opacity = 1)}
             onMouseOut={e => (e.currentTarget.style.opacity = 0.6)}
@@ -647,9 +748,26 @@ function Footer() {
 
 // ---- App ------------------------------------------------------------------
 export default function App() {
-  const { page, navigate } = useHashRoute("home");
+  const { page, navigate: navigateHash } = useHashRoute("home");
+  const [transitionActive, setTransitionActive] = useState(false);
+  const [nextTarget, setNextTarget] = useState(null);
 
-  // Dev sanity checks (simple runtime "tests")
+  const navigate = useCallback((to) => {
+    if (!to) return;
+    const target = to.startsWith('#') ? to.slice(1) : to;
+    if (target === (window.location.hash?.slice(1) || 'home')) return;
+    setNextTarget(target);
+    setTransitionActive(true);
+  }, []);
+
+  function handleTransitionFinish() {
+    setTransitionActive(false);
+    if (nextTarget) {
+      navigateHash(nextTarget);
+      setNextTarget(null);
+    }
+  }
+
   useEffect(() => {
     console.assert(Array.isArray(PAGES), "PAGES should be an array");
     const ids = new Set();
@@ -660,7 +778,6 @@ export default function App() {
     }
   }, []);
 
-  // Page render logic
   function renderPage() {
     switch (page) {
       case "home":
@@ -684,6 +801,12 @@ export default function App() {
     <div className={theme.brand.bg}>
       <SiteBackground />
       <Navbar current={page} onNav={navigate} />
+      <SeaAnimals
+        active={transitionActive}
+        count={3 + Math.floor(Math.random() * 4)}
+        duration={1600 + Math.floor(Math.random() * 1400)}
+        onFinish={handleTransitionFinish}
+      />
       <main>
         {renderPage()}
       </main>
