@@ -245,18 +245,118 @@ function HeroImageShowcase() {
   );
 }
 
-// ---- Page components -------------------------------------------------------
+// ---- Modern brand mark (pulse + glass capsule) ----------------------------
+function BrandMark({ onClick }) {
+  const reduced = usePrefersReducedMotion();
+
+  return (
+    <button
+      onClick={(e) => { e.preventDefault(); onClick?.("home"); }}
+      className="group relative flex items-center gap-3 px-2 py-1.5 rounded-xl hover:bg-white/70 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+      aria-label="Go to Home"
+    >
+      {/* Gradient ring + inner tile */}
+      <div className="relative shrink-0">
+        <div className="h-10 w-10 rounded-2xl p-[2px] bg-gradient-to-tr from-teal-500 to-emerald-500 shadow-sm">
+          <div className="h-full w-full rounded-[14px] bg-white grid place-items-center">
+            {/* Minimal physio icon: spine curve + heartbeat tick */}
+            <svg
+              viewBox="0 0 40 40"
+              className="h-6 w-6 text-teal-600"
+              aria-hidden
+            >
+              <defs>
+                <linearGradient id="pulseGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#10b981" />
+                  <stop offset="100%" stopColor="#14b8a6" />
+                </linearGradient>
+              </defs>
+              {/* Spine-like curve */}
+              <path
+                d="M8,28 C14,10 26,10 32,18"
+                fill="none"
+                stroke="url(#pulseGrad)"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                className={reduced ? "" : "brand-draw"}
+              />
+              {/* Small heartbeat tick */}
+              <path
+                d="M16,24 l3,-3 l2,5 l2,-3 l3,2"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={reduced ? "" : "brand-draw-delayed"}
+              />
+            </svg>
+          </div>
+        </div>
+
+        {/* Soft pulse glow */}
+        {!reduced && (
+          <span
+            className="pointer-events-none absolute -inset-1 rounded-2xl bg-emerald-400/30 blur-md animate-pulse"
+            aria-hidden
+          />
+        )}
+      </div>
+
+      {/* Text stack with subtle animated gradient on name */}
+      <div className="text-left">
+        <div
+          className={`font-semibold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 ${
+            reduced ? "" : "brand-shine"
+          }`}
+        >
+          Taylor Phillips — DPT Candidate
+        </div>
+        <div className="text-xs text-slate-500">
+          Physiotherapy • Movement • Rehab
+        </div>
+      </div>
+
+      {/* Local styles for tiny animations */}
+      <style>{`
+        @keyframes draw {
+          0% { stroke-dasharray: 1 100; stroke-dashoffset: 0; opacity: .7 }
+          60% { stroke-dasharray: 80 100; }
+          100% { stroke-dasharray: 100 0; stroke-dashoffset: 0; opacity: 1 }
+        }
+        .brand-draw {
+          stroke-dasharray: 100 0;
+          animation: draw 1.4s ease forwards;
+        }
+        .brand-draw-delayed {
+          stroke-dasharray: 100 0;
+          animation: draw 1.2s .25s ease forwards;
+        }
+        @keyframes shine {
+          0% { background-position: 0% 50%; }
+          100% { background-position: 200% 50%; }
+        }
+        .brand-shine {
+          background-size: 200% 100%;
+          animation: shine 6s linear infinite;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .brand-draw, .brand-draw-delayed, .brand-shine { animation: none !important; }
+        }
+      `}</style>
+    </button>
+  );
+}
+
+// ---- Updated Navbar --------------------------------------------------------
 function Navbar({ current, onNav }) {
   return (
-    <header className={`sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/90 border-b border-slate-100`}>
+    <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/90 border-b border-slate-100">
       <div className={`${theme.section} flex flex-col gap-2 md:flex-row items-center justify-between py-3 px-2`}>
-        <a href="#home" onClick={(e)=>{e.preventDefault(); onNav("home");}} className="flex items-center gap-3 w-full md:w-auto justify-center md:justify-start">
-          <div className="h-9 w-9 rounded-xl bg-teal-600 grid place-content-center text-white font-bold">PT</div>
-          <div>
-            <div className="font-semibold leading-tight text-center md:text-left">Taylor Phillips — DPT Candidate</div>
-            <div className="text-xs text-slate-500 text-center md:text-left">Physiotherapy • Movement • Rehab</div>
-          </div>
-        </a>
+        {/* New brand cluster */}
+        <BrandMark onClick={onNav} />
+
+        {/* Nav links */}
         <nav className="flex flex-wrap justify-center md:flex-nowrap md:flex items-center gap-1 w-full md:w-auto mt-2 md:mt-0">
           {PAGES.map(p => (
             <a
@@ -269,7 +369,15 @@ function Navbar({ current, onNav }) {
             </a>
           ))}
         </nav>
-        <a href="#contact" onClick={(e)=>{e.preventDefault(); onNav("contact");}} className="mt-2 md:mt-0 px-3 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 w-full md:w-auto text-center">Get in touch</a>
+
+        {/* CTA */}
+        <a
+          href="#contact"
+          onClick={(e)=>{e.preventDefault(); onNav("contact");}}
+          className="mt-2 md:mt-0 px-3 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 w-full md:w-auto text-center"
+        >
+          Get in touch
+        </a>
       </div>
     </header>
   );
@@ -675,6 +783,7 @@ function EmojiPoemPopup({ visible, emojiChar, poem }) {
           0% { opacity: 0.85; filter: blur(0px) }
           50% { opacity: 1; filter: blur(1px) }
           100% { opacity: 0.85; filter: blur(0px) }
+        }
       `}</style>
     </div>
   );
